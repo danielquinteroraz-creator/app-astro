@@ -3,25 +3,26 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="ASTRO, colección de prendas y accesorios de líneas depuradas.">
-  <title>Catálogo | ASTRO</title>
+  <meta name="description" content="ASTRO, colección de prendas y accesorios de líneas depuradas." data-i18n-content="metaDescription">
+  <title data-i18n="titleCatalog">Catálogo | ASTRO</title>
   <link rel="stylesheet" href="css/styles.css">
   <script defer src="js/products.js"></script>
+  <script defer src="js/i18n.js"></script>
   <script defer src="js/cart.js"></script>
   <script defer src="js/main.js"></script>
 </head>
 <body data-page="catalogo">
-  <a class="skip" href="#principal">Saltar al contenido</a>
+  <a class="skip" href="#principal" data-i18n="skip">Saltar al contenido</a>
   <header class="header" id="cabecera"></header>
   <main id="principal" tabindex="-1">
-<section class="intro wrap"><p class="label">El guardarropa ASTRO</p><h1>Catálogo</h1><p>Explora la colección por categoría, talla y precio.</p></section>
-    <section class="wrap section compact-top" aria-label="Productos del catálogo">
+<section class="intro wrap"><p class="label" data-i18n="wardrobe">El guardarropa ASTRO</p><h1 data-i18n="catalog">Catálogo</h1><p data-i18n="catalogIntro">Explora la colección por categoría, talla y precio.</p></section>
+    <section class="wrap section compact-top" aria-label="Productos del catálogo" data-i18n-aria-label="catalogProducts">
       <form id="filtros" class="filters">
-        <label>Categoría<select name="categoria" id="filtro-categoria"><option value="">Todas</option></select></label>
-        <label>Talla<select name="talla" id="filtro-talla"><option value="">Todas</option></select></label>
-        <label>Precio<select name="precio"><option value="">Todos</option><option value="35-99">Hasta 99 €</option><option value="100-149">100–149 €</option><option value="150-199">150–199 €</option><option value="200-320">Desde 200 €</option></select></label>
-        <label>Ordenar<select name="orden"><option value="recientes">Más recientes</option><option value="asc">Menor precio</option><option value="desc">Mayor precio</option></select></label>
-        <button class="button outline" type="reset">Limpiar filtros</button>
+        <label><span data-i18n="category">Categoría</span><select name="categoria" id="filtro-categoria"><option value="" data-i18n="allFeminine">Todas</option></select></label>
+        <label><span data-i18n="size">Talla</span><select name="talla" id="filtro-talla"><option value="" data-i18n="allFeminine">Todas</option></select></label>
+        <label><span data-i18n="price">Precio</span><select name="precio"><option value="" data-i18n="allMasculine">Todos</option><option value="35-99" data-i18n="priceUnder">Hasta 99 €</option><option value="100-149" data-i18n="priceMiddleLow">100–149 €</option><option value="150-199" data-i18n="priceMiddleHigh">150–199 €</option><option value="200-320" data-i18n="priceFrom">Desde 200 €</option></select></label>
+        <label><span data-i18n="sort">Ordenar</span><select name="orden"><option value="recientes" data-i18n="newest">Más recientes</option><option value="asc" data-i18n="priceLow">Menor precio</option><option value="desc" data-i18n="priceHigh">Mayor precio</option></select></label>
+        <button class="button outline" type="reset" data-i18n="resetFilters">Limpiar filtros</button>
       </form>
       <p id="resultados" class="label results" role="status"></p>
       <div class="product-grid" id="productos"></div>

@@ -129,6 +129,23 @@ address { font-style: normal; margin-bottom: 1rem; }
 .nav a:hover::after, .nav a[aria-current="page"]::after, .footer-nav a:hover::after { transform: scaleX(1); }
 .bag-link { justify-self: end; display: inline-flex; align-items: center; gap: .5rem; min-height: 44px; min-width: 44px; justify-content: end; }
 .bag-link span { font-size: .77rem; min-width: .8rem; text-align: center; }
+.header-actions { justify-self: end; display: flex; align-items: center; gap: .5rem; }
+.language-selector { display: inline-flex; align-items: center; gap: .15rem; }
+.language-selector button {
+  min-width: 28px;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: 600 .67rem/1 var(--sans);
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.language-selector span { font-size: .67rem; }
+.language-selector button[aria-pressed="true"] { text-decoration: underline; text-underline-offset: .3em; }
+.language-in-menu { display: none; }
 .menu-button { display: none; }
 
 .hero { min-height: calc(100vh - var(--header)); min-height: calc(100svh - var(--header)); position: relative; display: grid; align-items: center; isolation: isolate; color: var(--paper); }
@@ -285,6 +302,7 @@ fieldset > :last-child { margin-bottom: 0; }
   .menu-button { display: block; margin: 0; padding: .65rem .15rem; min-height: 44px; border: 0; background: transparent; }
   .nav { display: none; position: absolute; inset: 100% 0 auto; max-height: calc(100dvh - var(--header)); overflow: auto; background: var(--paper); border-bottom: 1px solid var(--line); padding: 1rem var(--gutter) 1.5rem; flex-direction: column; align-items: start; gap: .55rem; }
   .nav.open { display: flex; }
+  .language-in-menu { display: inline-flex; }
   .nav a { padding: .55rem 0; }
   .nav a::after { bottom: .25rem; }
   .hero > img { object-position: 62% center; }

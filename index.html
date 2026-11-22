@@ -3,43 +3,44 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="ASTRO, colección de prendas y accesorios de líneas depuradas.">
-  <title>Inicio | ASTRO</title>
+  <meta name="description" content="ASTRO, colección de prendas y accesorios de líneas depuradas." data-i18n-content="metaDescription">
+  <title data-i18n="titleHome">Inicio | ASTRO</title>
   <link rel="stylesheet" href="css/styles.css">
   <script defer src="js/products.js"></script>
+  <script defer src="js/i18n.js"></script>
   <script defer src="js/cart.js"></script>
   <script defer src="js/main.js"></script>
 </head>
 <body data-page="inicio">
-  <a class="skip" href="#principal">Saltar al contenido</a>
+  <a class="skip" href="#principal" data-i18n="skip">Saltar al contenido</a>
   <header class="header" id="cabecera"></header>
   <main id="principal" tabindex="-1">
     <section class="hero">
-      <img src="assets/img/hero.jpg" alt="Modelo con abrigo camel entre muros de piedra al sol" fetchpriority="high">
+      <img src="assets/img/hero.jpg" alt="Modelo con abrigo camel entre muros de piedra al sol" fetchpriority="high" data-i18n-alt="heroAlt">
       <div class="hero-content wrap">
-        <p class="label">Otoño / Invierno 2026</p>
-        <h1>La forma<br><em>del silencio.</em></h1>
-        <p>Siluetas precisas, texturas cálidas y tonos minerales.</p>
-        <a class="button light" href="shop.html#coleccion">Descubrir colección</a>
+        <p class="label" data-i18n="season">Otoño / Invierno 2026</p>
+        <h1 data-i18n-html="heroTitle">La forma<br><em>del silencio.</em></h1>
+        <p data-i18n="heroIntro">Siluetas precisas, texturas cálidas y tonos minerales.</p>
+        <a class="button light" href="shop.html#coleccion" data-i18n="discoverCollection">Descubrir colección</a>
       </div>
-      <span class="hero-caption label">ASTRO · Cuaderno de temporada</span>
+      <span class="hero-caption label" data-i18n="heroCaption">ASTRO · Cuaderno de temporada</span>
     </section>
-    <div class="strip label">Colección en edición limitada <span aria-hidden="true">✧</span> Envío gratis desde 150 €</div>
+    <div class="strip label" data-i18n-html="limitedStrip">Colección en edición limitada <span aria-hidden="true">✧</span> Envío gratis desde 150 €</div>
     <section class="wrap section">
-      <div class="section-head"><div><p class="label">Guía de la colección</p><h2>Explora por categoría</h2></div><a class="under" href="shop.html">Ver todas las categorías</a></div>
+      <div class="section-head"><div><p class="label" data-i18n="collectionGuide">Guía de la colección</p><h2 data-i18n="browseCategories">Explora por categoría</h2></div><a class="under" href="shop.html" data-i18n="allCategories">Ver todas las categorías</a></div>
       <div class="category-grid home-categories" id="categorias"></div>
     </section>
     <section class="section paper"><div class="wrap">
-      <div class="section-head"><div><p class="label">Recién llegados</p><h2>Piezas destacadas</h2></div><a class="under" href="catalogo.html">Ver catálogo</a></div>
+      <div class="section-head"><div><p class="label" data-i18n="justIn">Recién llegados</p><h2 data-i18n="featured">Piezas destacadas</h2></div><a class="under" href="catalogo.html" data-i18n="viewCatalog">Ver catálogo</a></div>
       <div class="product-grid" id="destacados"></div>
     </div></section>
     <section class="wrap split section">
-      <div class="frame"><img src="assets/img/atelier.jpg" alt="Manos junto a tejidos de lino en la mesa del taller" loading="lazy" decoding="async"></div>
-      <div class="split-copy"><p class="label">El estudio</p><h2>El cuidado empieza en el tejido.</h2><p>Elegimos cada fibra por su tacto y su caída. De ahí nacen prendas que se combinan con facilidad y ganan carácter con el uso.</p><a class="under" href="marca.html">Conocer la marca</a></div>
+      <div class="frame"><img src="assets/img/atelier.jpg" alt="Manos junto a tejidos de lino en la mesa del taller" loading="lazy" decoding="async" data-i18n-alt="atelierAlt"></div>
+      <div class="split-copy"><p class="label" data-i18n="studio">El estudio</p><h2 data-i18n="fabricHeading">El cuidado empieza en el tejido.</h2><p data-i18n="fabricIntro">Elegimos cada fibra por su tacto y su caída. De ahí nacen prendas que se combinan con facilidad y ganan carácter con el uso.</p><a class="under" href="marca.html" data-i18n="aboutLink">Conocer la marca</a></div>
     </section>
     <section class="newsletter paper section"><div class="wrap">
-      <p class="label">Cartas de ASTRO</p><h2>Notas desde el estudio</h2><p>Recibe ediciones, nuevas colecciones y visitas al taller.</p>
-      <form class="inline-form demo-form" data-success="Gracias. Has completado la suscripción de demostración."><label class="sr" for="boletin">Correo electrónico</label><input id="boletin" type="email" placeholder="Tu correo electrónico" required><button class="button">Suscribirme</button><p role="status" class="form-status"></p></form>
+      <p class="label" data-i18n="astroLetters">Cartas de ASTRO</p><h2 data-i18n="newsletter">Notas desde el estudio</h2><p data-i18n="newsletterIntro">Recibe ediciones, nuevas colecciones y visitas al taller.</p>
+      <form class="inline-form demo-form" data-success="Gracias. Has completado la suscripción de demostración." data-i18n-success="newsletterSuccess"><label class="sr" for="boletin" data-i18n="email">Correo electrónico</label><input id="boletin" type="email" placeholder="Tu correo electrónico" required data-i18n-placeholder="emailPlaceholder"><button class="button" data-i18n="subscribe">Suscribirme</button><p role="status" class="form-status"></p></form>
     </div></section>
   </main>
   <footer class="footer" id="pie"></footer>

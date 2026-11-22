@@ -4,6 +4,7 @@
   const key = "astro-bolsa-v1";
   const queryKey = "bolsa";
   const isLocalFile = location.protocol === "file:";
+  const { lang, t, persistAcrossLinks } = window.AstroI18n;
   const productById = new Map(window.PRODUCTS.map(product => [product.id, product]));
 
   function quantity(value) {
@@ -41,20 +42,24 @@
     const count = lines.reduce((sum, line) => sum + line.qty, 0);
     document.querySelectorAll("[data-cart-count]").forEach(node => {
       node.textContent = count;
-      node.closest("a").setAttribute("aria-label", "Bolsa de compra, " + count + (count === 1 ? " artículo" : " artículos"));
+      node.closest("a").setAttribute("aria-label", t(count === 1 ? "bagOne" : "bagMany", { count }));
     });
   }
 
   // Los navegadores pueden aislar localStorage para cada archivo. En ese caso,
   // los enlaces locales transportan únicamente las referencias de los artículos.
+  function withBag(url) {
+    if (isLocalFile) url.searchParams.set(queryKey, JSON.stringify(lines));
+    return url;
+  }
+
   function syncLinks() {
-    if (!isLocalFile) return;
-    const snapshot = JSON.stringify(lines);
+    if (!isLocalFile && !persistAcrossLinks) return;
     document.querySelectorAll('a[href]').forEach(link => {
       const href = link.getAttribute("href");
       if (!/^[a-z]+\.html(?:[?#]|$)/.test(href)) return;
-      const url = new URL(href, location.href);
-      url.searchParams.set(queryKey, snapshot);
+      const url = withBag(new URL(href, location.href));
+      if (persistAcrossLinks) url.searchParams.set("lang", lang);
       link.setAttribute("href", url.pathname.split("/").pop() + url.search + url.hash);
     });
   }
@@ -80,6 +85,7 @@
 
   window.AstroCart = {
     lines: () => lines.map(line => ({ ...line, product: productById.get(line.id) })),
+    withBag,
     add(id, size, color, qty) {
       const product = productById.get(id);
       if (!product || !product.sizes.includes(size) || !product.colors.includes(color)) return;

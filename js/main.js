@@ -1,49 +1,80 @@
 (() => {
   "use strict";
 
-  const products = window.PRODUCTS;
-  const categories = window.CATEGORIES;
+  const { lang, t, apply } = window.AstroI18n;
+  const english = lang === "en";
+  const categories = english ? window.CATEGORY_EN : window.CATEGORIES;
+  const colorLabel = color => english ? window.COLOR_EN[color] : color;
+  const sizeLabel = size => size === "Única" ? t("oneSize") : size;
+  const products = english ? window.PRODUCTS.map(product => {
+    const copy = window.PRODUCT_EN[product.id];
+    const [front, alternate] = product.images;
+    return {
+      ...product,
+      ...copy,
+      images: [
+        { ...front, alt: copy.name + " in " + colorLabel(product.colors[0]).toLowerCase() + ", main view" },
+        { ...alternate, alt: copy.name + ", alternate view" }
+      ]
+    };
+  }) : window.PRODUCTS;
+  const productById = new Map(products.map(product => [product.id, product]));
   const cart = window.AstroCart;
+  const localizedLines = () => cart.lines().map(line => ({ ...line, product: productById.get(line.id) }));
   const page = document.body.dataset.page;
   const params = new URLSearchParams(location.search);
-  const euro = new Intl.NumberFormat("es-ES", { style: "currency", currency: "EUR", maximumFractionDigits: 0 });
+  const euro = new Intl.NumberFormat(english ? "en-IE" : "es-ES", { style: "currency", currency: "EUR", maximumFractionDigits: 0 });
   const money = number => euro.format(number);
   const select = selector => document.querySelector(selector);
   const productLink = product => "producto.html?id=" + encodeURIComponent(product.id);
   const categoryLink = category => "catalogo.html?cat=" + encodeURIComponent(category);
   const star = '<svg viewBox="0 0 20 20" width="14" height="14" aria-hidden="true"><path d="M10 0c.8 6.5 3.5 9.2 10 10-6.5.8-9.2 3.5-10 10C9.2 13.5 6.5 10.8 0 10 6.5 9.2 9.2 6.5 10 0Z" fill="currentColor"/></svg>';
-  const logo = '<a class="logo" href="index.html" aria-label="ASTRO, inicio">ASTRO' + star + '</a>';
+  const logo = `<a class="logo" href="index.html" aria-label="${t("brandHome")}">ASTRO${star}</a>`;
   const navigation = [
-    ["inicio", "index.html", "Inicio"],
-    ["marca", "marca.html", "Marca"],
-    ["tienda", "shop.html", "Tienda"],
-    ["catalogo", "catalogo.html", "Catálogo"],
-    ["contacto", "contacto.html", "Contacto"]
+    ["inicio", "index.html", t("home")],
+    ["marca", "marca.html", t("brand")],
+    ["tienda", "shop.html", t("shop")],
+    ["catalogo", "catalogo.html", t("catalog")],
+    ["contacto", "contacto.html", t("contact")]
   ];
 
   function renderShell() {
     const nav = navigation.map(([key, url, text]) =>
       `<a href="${url}" ${page === key ? 'aria-current="page"' : ""}>${text}</a>`).join("");
-    select("#cabecera").innerHTML = `<div class="header-inner">
+    const selector = variant => `<div class="language-selector ${variant}" role="group" aria-label="${t("language")}">
+      <button type="button" data-lang="es" aria-pressed="${lang === "es"}" aria-label="${t("chooseSpanish")}">ES</button>
+      <span aria-hidden="true">/</span>
+      <button type="button" data-lang="en" aria-pressed="${lang === "en"}" aria-label="${t("chooseEnglish")}">EN</button>
+    </div>`;
+    const header = select("#cabecera");
+    header.innerHTML = `<div class="header-inner">
       ${logo}
-      <button class="menu-button label" type="button" aria-expanded="false" aria-controls="navegacion">Menú</button>
-      <nav class="nav label" id="navegacion" aria-label="Navegación principal">${nav}</nav>
-      <a class="bag-link" href="carrito.html">
+      <button class="menu-button label" type="button" aria-expanded="false" aria-controls="navegacion">${t("menu")}</button>
+      <nav class="nav label" id="navegacion" aria-label="${t("mainNav")}">${nav}${selector("language-in-menu")}</nav>
+      <div class="header-actions">${selector("language-by-bag")}<a class="bag-link" href="carrito.html">
         <svg width="22" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.35" aria-hidden="true"><path d="M4 8h16l1 13H3L4 8Z"/><path d="M8.5 9V6a3.5 3.5 0 0 1 7 0v3"/></svg>
         <span data-cart-count>0</span>
-      </a>
+      </a></div>
     </div>`;
     select("#pie").innerHTML = `<div class="wrap">
-      <div class="footer-top"><div>${logo}<p>Prendas de líneas depuradas.<br>Diseñadas para el día a día.</p></div>
-      <nav class="footer-nav label" aria-label="Navegación del pie">${navigation.slice(1).map(([, url, text]) => `<a href="${url}">${text}</a>`).join("")}</nav>
-      <div><p class="label">Estudio Madrid</p><p>Martes a sábado<br><a class="under" href="contacto.html">Horarios y contacto</a></p></div></div>
-      <div class="footer-bottom label"><span>© 2026 ASTRO</span><span>Tienda de demostración · España · EUR</span></div></div>`;
+      <div class="footer-top"><div>${logo}<p>${t("footerTagline")}</p></div>
+      <nav class="footer-nav label" aria-label="${t("footerNav")}">${navigation.slice(1).map(([, url, text]) => `<a href="${url}">${text}</a>`).join("")}</nav>
+      <div><p class="label">${t("madridStudio")}</p><p>${t("openDays")}<br><a class="under" href="contacto.html">${t("hoursContact")}</a></p></div></div>
+      <div class="footer-bottom label"><span>© 2026 ASTRO</span><span>${t("demoLocation")}</span></div></div>`;
 
     const button = select(".menu-button");
     const menu = select("#navegacion");
+    header.querySelectorAll("[data-lang]").forEach(control => {
+      control.addEventListener("click", () => {
+        if (control.dataset.lang === lang) return;
+        const url = new URL(location.href);
+        url.searchParams.set("lang", control.dataset.lang);
+        location.replace(cart.withBag(url));
+      });
+    });
     const toggle = open => {
       button.setAttribute("aria-expanded", String(open));
-      button.textContent = open ? "Cerrar" : "Menú";
+      button.textContent = open ? t("close") : t("menu");
       menu.classList.toggle("open", open);
     };
     button.addEventListener("click", () => toggle(!menu.classList.contains("open")));
@@ -64,9 +95,9 @@
 
   function cards(list) {
     return list.map(product => `<article class="product-card"><a href="${productLink(product)}">
-      <div class="frame product-photo">${image(product.images[0])}${product.new ? '<span class="tag label">Novedad</span>' : ""}</div>
+      <div class="frame product-photo">${image(product.images[0])}${product.new ? `<span class="tag label">${t("newArrival")}</span>` : ""}</div>
       <div class="card-meta"><h3>${product.name}</h3><span>${money(product.price)}</span></div>
-      <p class="muted card-color">${product.colors[0]}</p>
+      <p class="muted card-color">${colorLabel(product.colors[0])}</p>
     </a></article>`).join("");
   }
 
@@ -82,14 +113,14 @@
     if (featured) featured.innerHTML = cards(products.filter(product => product.featured));
   }
 
-  const options = items => items.map(item => `<option value="${item}">${item}</option>`).join("");
+  const options = (items, label) => items.map(item => `<option value="${item}">${label(item)}</option>`).join("");
 
   function renderCatalog() {
     const form = select("#filtros");
     const { categoria, talla, precio, orden } = form.elements;
     categoria.insertAdjacentHTML("beforeend", Object.entries(categories).map(([id, name]) => `<option value="${id}">${name}</option>`).join(""));
     const sizes = ["XS", "S", "M", "L", "XL", "34", "36", "38", "40", "42", "44", "Única"];
-    talla.insertAdjacentHTML("beforeend", options(sizes));
+    talla.insertAdjacentHTML("beforeend", options(sizes, sizeLabel));
     const initialCategory = params.get("cat");
     if (Object.hasOwn(categories, initialCategory)) categoria.value = initialCategory;
     const initialSort = params.get("orden");
@@ -107,8 +138,8 @@
         if (orden.value === "desc") return b.price - a.price;
         return b.added.localeCompare(a.added);
       });
-      select("#resultados").textContent = list.length + (list.length === 1 ? " resultado" : " resultados");
-      select("#productos").innerHTML = list.length ? cards(list) : '<p class="empty-grid">Ninguna prenda coincide con esos filtros.</p>';
+      select("#resultados").textContent = t(list.length === 1 ? "resultOne" : "resultMany", { count: list.length });
+      select("#productos").innerHTML = list.length ? cards(list) : `<p class="empty-grid">${t("catalogEmpty")}</p>`;
       cart.refresh();
     }
     form.addEventListener("submit", event => event.preventDefault());
@@ -117,7 +148,7 @@
     update();
   }
 
-  function empty(title, description, label = "Explorar catálogo", href = "catalogo.html") {
+  function empty(title, description, label = t("exploreCatalog"), href = "catalogo.html") {
     return `<div class="empty"><p class="empty-star" aria-hidden="true">${star}</p><h2>${title}</h2><p>${description}</p><a class="button" href="${href}">${label}</a></div>`;
   }
 
@@ -125,33 +156,33 @@
     const root = select("#ficha");
     const product = products.find(item => item.id === params.get("id"));
     if (!product) {
-      document.title = "Prenda no encontrada | ASTRO";
-      root.innerHTML = '<p class="label centered">Error 404</p>' + empty("Esta pieza no está disponible", "Puede que la edición haya terminado o que el enlace haya cambiado.").replace("<h2>", "<h1>").replace("</h2>", "</h1>");
+      document.title = t("notFoundTitle");
+      root.innerHTML = `<p class="label centered">${t("error404")}</p>` + empty(t("notFound"), t("notFoundDetail")).replace("<h2>", "<h1>").replace("</h2>", "</h1>");
       return;
     }
     document.title = product.name + " | ASTRO";
     const related = products.filter(item => item.category === product.category && item.id !== product.id);
     related.push(...products.filter(item => item.category !== product.category && item.featured).slice(0, 3 - related.length));
-    root.innerHTML = `<div class="breadcrumbs"><a href="catalogo.html">Catálogo</a><span aria-hidden="true">/</span><a href="${categoryLink(product.category)}">${categories[product.category]}</a></div>
+    root.innerHTML = `<div class="breadcrumbs"><a href="catalogo.html">${t("catalog")}</a><span aria-hidden="true">/</span><a href="${categoryLink(product.category)}">${categories[product.category]}</a></div>
       <div class="product-layout">
-        <section class="gallery" aria-label="Galería de la prenda">
+        <section class="gallery" aria-label="${t("gallery")}">
           <div class="frame gallery-main" id="foto-principal">${image(product.images[0], true)}</div>
-          <div class="thumbs">${product.images.map((photo, index) => `<button type="button" data-photo="${index}" aria-label="Ver foto ${index + 1}: ${photo.alt}" aria-pressed="${index === 0}">${image({ ...photo, alt: "" })}</button>`).join("")}</div>
+          <div class="thumbs">${product.images.map((photo, index) => `<button type="button" data-photo="${index}" aria-label="${t("photoLabel", { number: index + 1, alt: photo.alt })}" aria-pressed="${index === 0}">${image({ ...photo, alt: "" })}</button>`).join("")}</div>
         </section>
         <section class="product-copy"><p class="label">${categories[product.category]}</p><h1>${product.name}</h1><p class="product-price">${money(product.price)}</p><p>${product.description}</p>
           <form id="anadir" class="stack">
             <div class="variant-grid">
-              <label>Talla<select name="talla" required><option value="">Elige una talla</option>${options(product.sizes)}</select></label>
-              <label>Color<select name="color" required>${options(product.colors)}</select></label>
+              <label>${t("size")}<select name="talla" required><option value="">${t("chooseSize")}</option>${options(product.sizes, sizeLabel)}</select></label>
+              <label>${t("colour")}<select name="color" required>${options(product.colors, colorLabel)}</select></label>
             </div>
-            <div class="purchase"><label>Cantidad<input type="number" name="cantidad" min="1" max="99" value="1" required></label><button class="button">Añadir al carrito</button></div>
-            <p id="estado-bolsa" class="form-status" role="status"></p><a class="under" id="ver-bolsa" href="carrito.html" hidden>Ver bolsa de compra</a>
+            <div class="purchase"><label>${t("quantity")}<input type="number" name="cantidad" min="1" max="99" value="1" required></label><button class="button">${t("addToBag")}</button></div>
+            <p id="estado-bolsa" class="form-status" role="status"></p><a class="under" id="ver-bolsa" href="carrito.html" hidden>${t("viewBag")}</a>
           </form>
-          <details open><summary>Composición y cuidados</summary><p>${product.composition}. ${product.care}</p></details>
-          <details><summary>Envíos y devoluciones</summary><p>Envío estándar de 2 a 4 días laborables por 6 €. Gratis desde 150 €. Plazo ilustrativo de devolución de 30 días.</p></details>
+          <details open><summary>${t("compositionCare")}</summary><p>${product.composition}. ${product.care}</p></details>
+          <details><summary>${t("deliveryReturns")}</summary><p>${t("deliveryReturnsDetail")}</p></details>
         </section>
       </div>
-      <section class="related"><div class="section-head"><h2>También te puede interesar</h2></div><div class="product-grid related-grid">${cards(related)}</div></section>`;
+      <section class="related"><div class="section-head"><h2>${t("related")}</h2></div><div class="product-grid related-grid">${cards(related)}</div></section>`;
 
     root.querySelectorAll("[data-photo]").forEach(button => {
       button.addEventListener("click", () => {
@@ -166,36 +197,36 @@
       event.preventDefault();
       const values = new FormData(event.currentTarget);
       cart.add(product.id, values.get("talla"), values.get("color"), values.get("cantidad"));
-      select("#estado-bolsa").textContent = "La selección se ha añadido a tu bolsa.";
+      select("#estado-bolsa").textContent = t("addedToBag");
       select("#ver-bolsa").hidden = false;
     });
   }
 
   function totals(method) {
     const { subtotal, shipping, total } = cart.totals(method);
-    return `<dl class="totals"><div><dt>Subtotal</dt><dd>${money(subtotal)}</dd></div>
-      <div><dt>${method === "recogida" ? "Recogida" : "Envío"}</dt><dd>${shipping ? money(shipping) : "Gratis"}</dd></div>
-      <div class="total"><dt>Total</dt><dd>${money(total)}</dd></div></dl>`;
+    return `<dl class="totals"><div><dt>${t("subtotal")}</dt><dd>${money(subtotal)}</dd></div>
+      <div><dt>${method === "recogida" ? t("pickup") : t("shipping")}</dt><dd>${shipping ? money(shipping) : t("free")}</dd></div>
+      <div class="total"><dt>${t("total")}</dt><dd>${money(total)}</dd></div></dl>`;
   }
 
   function renderCart() {
     const root = select("#bolsa");
-    const lines = cart.lines();
+    const lines = localizedLines();
     if (!lines.length) {
-      root.innerHTML = empty("Tu bolsa está vacía", "Encuentra una pieza para empezar tu selección.");
+      root.innerHTML = empty(t("bagEmpty"), t("bagEmptyDetail"));
       cart.refresh();
       return;
     }
     root.innerHTML = `<div class="commerce-grid"><div class="cart-lines">${lines.map(({ product, size, color, qty }, index) =>
       `<article class="cart-line">
-        <a class="frame cart-image" href="${productLink(product)}" aria-label="Ver ${product.name}">${image(product.images[0])}</a>
-        <div class="line-info"><h2><a href="${productLink(product)}">${product.name}</a></h2><p>${size} · ${color}</p>
-          <label class="label">Cantidad <input type="number" min="1" max="99" value="${qty}" data-qty="${index}" aria-label="Cantidad de ${product.name}, ${size}, ${color}"></label>
-          <button class="under remove" type="button" data-remove="${index}" aria-label="Eliminar ${product.name}, ${size}, ${color}">Eliminar</button></div>
+        <a class="frame cart-image" href="${productLink(product)}" aria-label="${t("viewProduct", { name: product.name })}">${image(product.images[0])}</a>
+        <div class="line-info"><h2><a href="${productLink(product)}">${product.name}</a></h2><p>${sizeLabel(size)} · ${colorLabel(color)}</p>
+          <label class="label">${t("quantity")} <input type="number" min="1" max="99" value="${qty}" data-qty="${index}" aria-label="${t("quantityLabel", { name: product.name, size: sizeLabel(size), colour: colorLabel(color) })}"></label>
+          <button class="under remove" type="button" data-remove="${index}" aria-label="${t("removeLabel", { name: product.name, size: sizeLabel(size), colour: colorLabel(color) })}">${t("remove")}</button></div>
         <strong data-line-total="${index}">${money(product.price * qty)}</strong>
       </article>`).join("")}</div>
-      <aside class="summary"><h2>Resumen</h2><div id="totales-bolsa" aria-live="polite">${totals()}</div><p class="muted">Envío estándar gratis desde 150 €.</p>
-      <a class="button" href="checkout.html">Finalizar compra</a><a class="under" href="catalogo.html">Seguir explorando</a></aside></div>`;
+      <aside class="summary"><h2>${t("summary")}</h2><div id="totales-bolsa" aria-live="polite">${totals()}</div><p class="muted">${t("freeDelivery")}</p>
+      <a class="button" href="checkout.html">${t("checkout")}</a><a class="under" href="catalogo.html">${t("keepBrowsing")}</a></aside></div>`;
     root.querySelectorAll("[data-qty]").forEach(input => {
       input.addEventListener("change", () => {
         const index = Number(input.dataset.qty);
@@ -219,41 +250,41 @@
 
   function renderCheckout() {
     const root = select("#checkout");
-    const lines = cart.lines();
+    const lines = localizedLines();
     if (!lines.length) {
-      root.innerHTML = empty("Tu bolsa está vacía", "Añade una pieza antes de finalizar la compra.");
+      root.innerHTML = empty(t("bagEmpty"), t("checkoutEmptyDetail"));
       cart.refresh();
       return;
     }
     root.innerHTML = `<div class="commerce-grid">
       <form id="pedido" class="checkout-form stack">
-        <fieldset><legend>Contacto</legend><p class="muted">Rellena el formulario con datos ficticios.</p>
-          <label>Correo electrónico<input type="email" name="correo" placeholder="ejemplo@correo.test" autocomplete="off" required></label>
+        <fieldset><legend>${t("contact")}</legend><p class="muted">${t("demoData")}</p>
+          <label>${t("email")}<input type="email" name="correo" placeholder="${t("exampleEmail")}" autocomplete="off" required></label>
         </fieldset>
-        <fieldset><legend>Dirección de envío</legend>
-          <label>Nombre y apellidos<input name="nombre" autocomplete="off" required minlength="2" maxlength="100"></label>
-          <label>Dirección<input name="direccion" autocomplete="off" required minlength="4" maxlength="150"></label>
-          <div class="variant-grid"><label>Código postal<input name="postal" inputmode="numeric" pattern="[0-9]{5}" title="Introduce cinco dígitos" autocomplete="off" required></label>
-          <label>Ciudad<input name="ciudad" autocomplete="off" required minlength="2" maxlength="100"></label></div>
-          <label>País<select name="pais"><option>España</option></select></label>
+        <fieldset><legend>${t("shippingAddress")}</legend>
+          <label>${t("fullName")}<input name="nombre" autocomplete="off" required minlength="2" maxlength="100"></label>
+          <label>${t("address")}<input name="direccion" autocomplete="off" required minlength="4" maxlength="150"></label>
+          <div class="variant-grid"><label>${t("postalCode")}<input name="postal" inputmode="numeric" pattern="[0-9]{5}" title="${t("postalFormat")}" autocomplete="off" required></label>
+          <label>${t("city")}<input name="ciudad" autocomplete="off" required minlength="2" maxlength="100"></label></div>
+          <label>${t("country")}<select name="pais"><option>${t("spain")}</option></select></label>
         </fieldset>
-        <fieldset><legend>Método de entrega</legend>
-          <label class="choice"><input type="radio" name="envio" value="estandar" checked> Envío estándar · 2 a 4 días laborables</label>
-          <label class="choice"><input type="radio" name="envio" value="recogida"> Recogida en el estudio · Gratis</label>
+        <fieldset><legend>${t("deliveryMethod")}</legend>
+          <label class="choice"><input type="radio" name="envio" value="estandar" checked> ${t("standardDelivery")}</label>
+          <label class="choice"><input type="radio" name="envio" value="recogida"> ${t("studioPickup")}</label>
         </fieldset>
-        <fieldset><legend>Pago de demostración</legend>
-          <p class="notice" id="demo-pago">Esta compra es una demostración y no procesa pagos. Usa los datos ficticios que se muestran. No introduzcas números de tarjeta reales.</p>
-          <label>Tarjeta de demostración<input type="text" placeholder="DEMO •••• •••• ••••" readonly aria-describedby="demo-pago"></label>
-          <div class="variant-grid"><label>Caducidad demo<input type="text" placeholder="MM/AA" readonly></label>
-          <label>Código demo<input type="text" placeholder="•••" readonly></label></div>
-          <label class="choice"><input type="checkbox" name="demo" required> Entiendo que el pedido es de demostración.</label>
+        <fieldset><legend>${t("demoPayment")}</legend>
+          <p class="notice" id="demo-pago">${t("paymentNotice")}</p>
+          <label>${t("demoCard")}<input type="text" placeholder="DEMO •••• •••• ••••" readonly aria-describedby="demo-pago"></label>
+          <div class="variant-grid"><label>${t("demoExpiry")}<input type="text" placeholder="${t("expiryPlaceholder")}" readonly></label>
+          <label>${t("demoCode")}<input type="text" placeholder="•••" readonly></label></div>
+          <label class="choice"><input type="checkbox" name="demo" required> ${t("demoAgreement")}</label>
         </fieldset>
-        <button class="button" type="submit">Confirmar pedido de prueba</button>
+        <button class="button" type="submit">${t("confirmOrder")}</button>
       </form>
-      <aside class="summary"><h2>Tu pedido</h2>
-        <ul class="order-lines">${lines.map(({ product, qty, size, color }) => `<li>${image(product.images[0])}<div>${product.name}<small>${qty} × ${size} · ${color}</small></div><span>${money(product.price * qty)}</span></li>`).join("")}</ul>
+      <aside class="summary"><h2>${t("yourOrder")}</h2>
+        <ul class="order-lines">${lines.map(({ product, qty, size, color }) => `<li>${image(product.images[0])}<div>${product.name}<small>${qty} × ${sizeLabel(size)} · ${colorLabel(color)}</small></div><span>${money(product.price * qty)}</span></li>`).join("")}</ul>
         <div id="totales-pedido" aria-live="polite">${totals()}</div>
-        <a class="under" href="carrito.html">Editar bolsa</a>
+        <a class="under" href="carrito.html">${t("editBag")}</a>
       </aside></div>`;
     const form = select("#pedido");
     form.addEventListener("change", () => {
@@ -261,21 +292,51 @@
       form.elements.direccion.required = method === "estandar";
       form.elements.postal.required = method === "estandar";
       form.elements.ciudad.required = method === "estandar";
+      for (const name of ["direccion", "postal", "ciudad"]) {
+        form.elements[name].setCustomValidity("");
+      }
       select("#totales-pedido").innerHTML = totals(method);
     });
     form.addEventListener("submit", event => {
       event.preventDefault();
       const number = "ASTRO-DEMO-" + String(Math.floor(100000 + Math.random() * 900000));
       cart.clear();
-      select(".intro h1").textContent = "Pedido confirmado";
-      root.innerHTML = empty("Gracias por tu visita", `Tu pedido de demostración ${number} se ha completado. No se ha realizado ningún cobro.`, "Volver al inicio", "index.html");
-      document.title = "Pedido confirmado | ASTRO";
+      select(".intro h1").textContent = t("confirmed");
+      root.innerHTML = empty(t("thanksForVisiting"), t("orderComplete", { number }), t("backHome"), "index.html");
+      document.title = t("confirmed") + " | ASTRO";
       select("#principal").focus();
       window.scrollTo(0, 0);
       cart.refresh();
     });
   }
 
+  function validationMessage(field) {
+    const validity = field.validity;
+    if (validity.badInput) return t("validationNumber");
+    if (validity.valueMissing) {
+      if (field.type === "checkbox") return t("validationCheckbox");
+      return t(field.tagName === "SELECT" ? "validationSelect" : "validationRequired");
+    }
+    if (validity.typeMismatch && field.type === "email") return t("validationEmail");
+    if (validity.patternMismatch) return field.title || t("validationInvalid");
+    if (validity.tooShort) return t("validationShort", { count: field.minLength });
+    if (validity.tooLong) return t("validationLong", { count: field.maxLength });
+    if (validity.rangeUnderflow) return t("validationMin", { value: field.min });
+    if (validity.rangeOverflow) return t("validationMax", { value: field.max });
+    if (validity.stepMismatch) return t("validationWhole");
+    return t("validationInvalid");
+  }
+
+  document.addEventListener("invalid", event => {
+    const field = event.target;
+    field.setCustomValidity("");
+    if (!field.validity.valid) field.setCustomValidity(validationMessage(field));
+  }, true);
+  for (const type of ["input", "change"]) {
+    document.addEventListener(type, event => event.target.setCustomValidity?.(""));
+  }
+
+  apply();
   renderShell();
   const renderers = {
     inicio: renderCategories, tienda: renderCategories, catalogo: renderCatalog,

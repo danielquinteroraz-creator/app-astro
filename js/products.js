@@ -530,3 +530,126 @@ window.PRODUCTS = [
     ]
   }
 ];
+
+window.PRODUCT_EN = {
+  "camisa-alba": {
+    name: "Alba Shirt",
+    description: "Crisp cotton poplin with a generous collar and elongated cuffs.",
+    composition: "100% cotton",
+    care: "Wash at 30 °C and iron on medium."
+  },
+  "camisa-duna": {
+    name: "Duna Shirt",
+    description: "Washed linen with an easy drape and mother-of-pearl buttons.",
+    composition: "100% linen",
+    care: "Wash at 30 °C and air dry."
+  },
+  "camisa-noche": {
+    name: "Noche Shirt",
+    description: "Fluid silk with a concealed placket and softly shaped shoulders.",
+    composition: "100% silk",
+    care: "Dry clean."
+  },
+  "pantalon-trazo": {
+    name: "Trazo Trousers",
+    description: "Tailored straight-leg trousers with deep pleats.",
+    composition: "55% wool, 45% viscose",
+    care: "Dry clean."
+  },
+  "pantalon-eje": {
+    name: "Eje Trousers",
+    description: "A high waist and wide leg, finished with a pressed front crease.",
+    composition: "65% wool, 35% viscose",
+    care: "Dry clean."
+  },
+  "pantalon-cal": {
+    name: "Cal Trousers",
+    description: "Soft twill with a straight leg and discreet pockets.",
+    composition: "98% cotton, 2% elastane",
+    care: "Wash inside out at 30 °C."
+  },
+  "abrigo-horizonte": {
+    name: "Horizonte Coat",
+    description: "A long wrap coat with broad lapels and a matching belt.",
+    composition: "90% wool, 10% cashmere",
+    care: "Dry clean and store on a broad hanger."
+  },
+  "americana-sombra": {
+    name: "Sombra Blazer",
+    description: "A defined shoulder, classic lapels and a single-button closure.",
+    composition: "70% wool, 30% viscose",
+    care: "Dry clean."
+  },
+  "chaqueta-oliva": {
+    name: "Oliva Jacket",
+    description: "A cropped jacket with patch pockets and a structured collar.",
+    composition: "100% cotton",
+    care: "Wash at 30 °C with similar colours."
+  },
+  "vestido-eclipse": {
+    name: "Eclipse Dress",
+    description: "An ankle-length bias cut with slender straps and a fluid drape.",
+    composition: "100% viscose",
+    care: "Hand wash cold and dry in the shade."
+  },
+  "vestido-brisa": {
+    name: "Brisa Dress",
+    description: "A linen midi with a defined waist and a gently flared skirt.",
+    composition: "100% linen",
+    care: "Wash at 30 °C and hang to dry."
+  },
+  "jersey-calma": {
+    name: "Calma Jumper",
+    description: "Fine-rib merino with a crew neck and long sleeves.",
+    composition: "100% merino wool",
+    care: "Hand wash cold and dry flat."
+  },
+  "cardigan-umbral": {
+    name: "Umbral Cardigan",
+    description: "A substantial V-neck knit with matte buttons.",
+    composition: "80% wool, 20% polyamide",
+    care: "Hand wash cold and dry flat."
+  },
+  "bolso-tierra": {
+    name: "Tierra Bag",
+    description: "A roomy bag in smooth leather with long handles and an inside pocket.",
+    composition: "Cowhide exterior, cotton lining",
+    care: "Wipe with a dry cloth and store in the dust bag."
+  },
+  "cinturon-orbita": {
+    name: "Órbita Belt",
+    description: "A slim leather strap finished with a small brushed-brass buckle.",
+    composition: "Cowhide and brass",
+    care: "Wipe with a soft cloth."
+  },
+  "bufanda-niebla": {
+    name: "Niebla Scarf",
+    description: "A light brushed-wool scarf with fringed edges.",
+    composition: "100% wool",
+    care: "Hand wash cold and dry flat."
+  }
+};
+
+window.CATEGORY_EN = {
+  camisas: "Shirts",
+  pantalones: "Trousers",
+  "chaquetas-y-abrigos": "Jackets and coats",
+  vestidos: "Dresses",
+  punto: "Knitwear",
+  accesorios: "Accessories"
+};
+
+window.COLOR_EN = {
+  Blanco: "White",
+  "Azul niebla": "Mist blue",
+  Arena: "Sand",
+  Hueso: "Bone",
+  Negro: "Black",
+  Marfil: "Ivory",
+  Camel: "Camel",
+  Topo: "Taupe",
+  Carbón: "Charcoal",
+  Crudo: "Ecru",
+  Oliva: "Olive",
+  Chocolate: "Chocolate"
+};
