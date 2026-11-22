@@ -337,3 +337,49 @@ fieldset > :last-child { margin-bottom: 0; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition: none !important; }
 }
+
+.install-button { margin: 0; min-height: 44px; }
+.footer .install-button:focus-visible { outline-color: var(--paper); }
+.install-in-menu { display: none; }
+.install-dialog {
+  width: min(calc(100% - 2 * var(--gutter)), 28rem);
+  max-height: calc(100% - 2 * var(--gutter));
+  padding: clamp(1.5rem, 5vw, 2.5rem);
+  border: 1px solid var(--line);
+  background: var(--bone);
+  color: var(--ink);
+}
+.install-dialog::backdrop { background: rgb(22 21 20 / 65%); }
+.install-dialog h2 { font-size: 2.6rem; margin-bottom: 1rem; }
+.offline-page { padding: 0; }
+.offline-page .empty { display: grid; justify-items: center; align-content: center; }
+.offline-page .empty-star img { width: 4rem; height: 4rem; }
+.offline-page h1 { font-size: clamp(2.8rem, 10vw, 5.5rem); }
+
+@media (max-width: 760px) {
+  .install-in-menu { display: inline-block; }
+}
+
+@media (display-mode: standalone) {
+  :root {
+    --safe-top: env(safe-area-inset-top, 0px);
+    scroll-padding-top: calc(var(--header) + var(--safe-top) + 1rem);
+  }
+  body:not(.offline-page) { padding-top: calc(var(--header) + var(--safe-top)); }
+  .header {
+    padding: var(--safe-top) env(safe-area-inset-right) 0 env(safe-area-inset-left);
+    background: linear-gradient(var(--ink) var(--safe-top), var(--paper) var(--safe-top));
+  }
+  .footer {
+    padding-bottom: calc(1rem + env(safe-area-inset-bottom));
+    padding-inline: env(safe-area-inset-left) env(safe-area-inset-right);
+  }
+}
+
+@media (display-mode: standalone) and (max-width: 760px) {
+  .nav {
+    max-height: calc(100dvh - var(--header) - var(--safe-top));
+    padding-inline: calc(var(--gutter) + env(safe-area-inset-left)) calc(var(--gutter) + env(safe-area-inset-right));
+    padding-bottom: calc(1.5rem + env(safe-area-inset-bottom));
+  }
+}

@@ -30,6 +30,7 @@
   const categoryLink = category => "catalogo.html?cat=" + encodeURIComponent(category);
   const star = '<svg viewBox="0 0 20 20" width="14" height="14" aria-hidden="true"><path d="M10 0c.8 6.5 3.5 9.2 10 10-6.5.8-9.2 3.5-10 10C9.2 13.5 6.5 10.8 0 10 6.5 9.2 9.2 6.5 10 0Z" fill="currentColor"/></svg>';
   const logo = `<a class="logo" href="index.html" aria-label="${t("brandHome")}">ASTRO${star}</a>`;
+  const installButton = placement => `<button class="install-button ${placement} under label" type="button" data-install hidden>${t("installApp")}</button>`;
   const navigation = [
     ["inicio", "index.html", t("home")],
     ["marca", "marca.html", t("brand")],
@@ -50,7 +51,7 @@
     header.innerHTML = `<div class="header-inner">
       ${logo}
       <button class="menu-button label" type="button" aria-expanded="false" aria-controls="navegacion">${t("menu")}</button>
-      <nav class="nav label" id="navegacion" aria-label="${t("mainNav")}">${nav}${selector("language-in-menu")}</nav>
+      <nav class="nav label" id="navegacion" aria-label="${t("mainNav")}">${nav}${selector("language-in-menu")}${installButton("install-in-menu")}</nav>
       <div class="header-actions">${selector("language-by-bag")}<a class="bag-link" href="carrito.html">
         <svg width="22" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.35" aria-hidden="true"><path d="M4 8h16l1 13H3L4 8Z"/><path d="M8.5 9V6a3.5 3.5 0 0 1 7 0v3"/></svg>
         <span data-cart-count>0</span>
@@ -58,7 +59,7 @@
     </div>`;
     select("#pie").innerHTML = `<div class="wrap">
       <div class="footer-top"><div>${logo}<p>${t("footerTagline")}</p></div>
-      <nav class="footer-nav label" aria-label="${t("footerNav")}">${navigation.slice(1).map(([, url, text]) => `<a href="${url}">${text}</a>`).join("")}</nav>
+      <nav class="footer-nav label" aria-label="${t("footerNav")}">${navigation.slice(1).map(([, url, text]) => `<a href="${url}">${text}</a>`).join("")}${installButton("")}</nav>
       <div><p class="label">${t("madridStudio")}</p><p>${t("openDays")}<br><a class="under" href="contacto.html">${t("hoursContact")}</a></p></div></div>
       <div class="footer-bottom label"><span>© 2026 ASTRO</span><span>${t("demoLocation")}</span></div></div>`;
 
@@ -79,7 +80,7 @@
     };
     button.addEventListener("click", () => toggle(!menu.classList.contains("open")));
     document.addEventListener("keydown", event => {
-      if (event.key === "Escape" && menu.classList.contains("open")) {
+      if (event.key === "Escape" && menu.classList.contains("open") && !select(".install-dialog[open]")) {
         toggle(false);
         button.focus();
       }
@@ -87,6 +88,63 @@
     matchMedia("(min-width: 761px)").addEventListener("change", event => {
       if (event.matches) toggle(false);
     });
+  }
+
+  function setupInstall() {
+    if (!/^https?:$/.test(location.protocol)) return;
+
+    const standalone = matchMedia("(display-mode: standalone)");
+    const safari = /Safari/.test(navigator.userAgent) &&
+      !/CriOS|FxiOS|EdgiOS|OPiOS/.test(navigator.userAgent) &&
+      (/iPhone|iPad|iPod/.test(navigator.userAgent) ||
+        (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1));
+    const buttons = document.querySelectorAll("[data-install]");
+    let prompt;
+    let installed = false;
+    const sync = () => {
+      for (const button of buttons) {
+        button.hidden = installed || standalone.matches || navigator.standalone === true || !(prompt || safari);
+      }
+    };
+
+    window.addEventListener("beforeinstallprompt", event => {
+      event.preventDefault();
+      prompt = event;
+      sync();
+    });
+    window.addEventListener("appinstalled", () => {
+      installed = true;
+      prompt = null;
+      sync();
+    });
+    standalone.addEventListener("change", sync);
+
+    for (const button of buttons) {
+      button.addEventListener("click", async () => {
+        if (!prompt) {
+          select(".install-dialog")?.showModal();
+          return;
+        }
+        const install = prompt;
+        prompt = null;
+        try {
+          await install.prompt();
+        } catch {
+          // The browser can invalidate a deferred prompt.
+        } finally {
+          sync();
+        }
+      });
+    }
+
+    if (safari) {
+      document.body.insertAdjacentHTML("beforeend", `<dialog class="install-dialog" aria-labelledby="install-title" aria-describedby="install-instructions">
+        <h2 id="install-title">${t("installApp")}</h2>
+        <p id="install-instructions">${t("installInstructions")}</p>
+        <form method="dialog"><button class="button" autofocus>${t("close")}</button></form>
+      </dialog>`);
+    }
+    sync();
   }
 
   function image(photo, eager = false) {
@@ -338,6 +396,12 @@
 
   apply();
   renderShell();
+  setupInstall();
+  if ("serviceWorker" in navigator && /^https?:$/.test(location.protocol)) {
+    navigator.serviceWorker.register("./sw.js").catch(error => {
+      console.warn("ASTRO service worker registration failed", error);
+    });
+  }
   const renderers = {
     inicio: renderCategories, tienda: renderCategories, catalogo: renderCatalog,
     producto: renderProduct, carrito: renderCart, checkout: renderCheckout

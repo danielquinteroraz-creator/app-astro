@@ -1,6 +1,12 @@
 (() => {
   "use strict";
 
+  // Chromium blocks manifest requests from file URLs.
+  const manifest = document.querySelector("#web-manifest");
+  if (manifest && /^https?:$/.test(location.protocol)) {
+    manifest.replaceWith(manifest.content.cloneNode(true));
+  }
+
   const entries = [
     ["skip", "Saltar al contenido", "Skip to content"],
     ["metaDescription", "ASTRO, colección de prendas y accesorios de líneas depuradas.", "ASTRO, a collection of clean-lined clothing and accessories."],
@@ -199,6 +205,11 @@
     ["orderComplete", "Tu pedido de demostración {number} se ha completado. No se ha realizado ningún cobro.", "Your demo order {number} is complete. No payment was taken."],
     ["oneSize", "Única", "One size"],
     ["language", "Idioma", "Language"],
+    ["installApp", "Instalar app", "Install app"],
+    ["installInstructions", "En Safari, toca Compartir y luego Añadir a pantalla de inicio.", "In Safari, tap Share, then Add to Home Screen."],
+    ["offlineTitle", "Sin conexión | ASTRO", "Offline | ASTRO"],
+    ["offlineHeading", "Estás sin conexión", "You’re offline"],
+    ["offlineDetail", "Esta página no está disponible sin conexión. Puedes seguir explorando el catálogo.", "This page is unavailable offline. You can still browse the catalogue."],
     ["chooseSpanish", "Cambiar a español", "Switch to Spanish"],
     ["chooseEnglish", "Cambiar a inglés", "Switch to English"],
     ["validationRequired", "Completa este campo.", "Complete this field."],
