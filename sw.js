@@ -1,4 +1,4 @@
-const CACHE = "astro-v1";
+const CACHE = "astro-v2";
 const FONT_CACHE = CACHE + "-fonts";
 const OFFLINE = "./offline.html";
 const PRECACHE = [

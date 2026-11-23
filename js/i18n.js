@@ -240,7 +240,7 @@
   } catch {
     persistAcrossLinks = true;
   }
-  const lang = supported(requested) ? requested : supported(stored) ? stored : "es";
+  const lang = supported(requested) ? requested : supported(stored) ? stored : "en";
 
   function t(key, values = {}) {
     return dictionaries[lang][key].replace(/\{(\w+)\}/g, (_, name) => values[name]);
